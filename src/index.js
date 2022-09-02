@@ -170,9 +170,9 @@ const move = () => {
     drawSnake();
     drawApple();
     drawScore();
-    setTimeout(() => {
-      requestAnimationFrame(move);
-    }, 1000 - speed);
+    // setTimeout(() => {
+    //   requestAnimationFrame(move);
+    // }, 1000 - speed);
   } else {
     alert(`Perdu ! Votre score est : ${score}`);
     running = false;
