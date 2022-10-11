@@ -39,13 +39,13 @@ const drawApple = () => {
 };
 
 window.addEventListener("resize", () => {
-  resizeGame();
+  entryPoint();
 });
 
 window.addEventListener("click", () => {
   if (!running) {
     running = true;
-    requestAnimationFrame(move);
+    requestAnimationFrame(mainLoop);
   }
 });
 
@@ -63,12 +63,15 @@ window.addEventListener("keydown", (event) => {
     case "ArrowDown":
       if (direction !== "n") direction = "s";
       break;
+    case " ":
+      alert("PAUSE");
+      break;
     default:
       break;
   }
 });
 
-const gameover = () => {
+const isGameOver = () => {
   // Enlever partie du if pour versionner jeu en passage des murs
   if (
     snake[0][0] >= canvas.width / gridElem ||
@@ -114,7 +117,8 @@ const generateSnake = () => {
   direction = ["e", "n", "s"][Math.trunc(Math.random() * 3)];
 };
 
-const updateSnakePosition = () => {
+
+const testColision = () => {
   let head;
   switch (direction) {
     case "e":
@@ -154,7 +158,7 @@ const updateSnakePosition = () => {
   } else {
     snake.pop();
   }
-  return gameover();
+  return isGameOver();
 };
 
 const drawScore = () => {
@@ -164,14 +168,14 @@ const drawScore = () => {
   ctx.fillText(score, gridElem, gridElem);
 };
 
-const move = () => {
-  if (!updateSnakePosition()) {
+const mainLoop = () => {
+  if (!testColision()) {
     drawMap();
     drawSnake();
     drawApple();
     drawScore();
     setTimeout(() => {
-      requestAnimationFrame(move);
+      requestAnimationFrame(mainLoop);
     }, 1000 - speed);
   } else {
     alert(`Perdu ! Votre score est : ${score}`);
@@ -198,7 +202,7 @@ const start = () => {
   generateSnake();
 };
 
-const resizeGame = () => {
+const entryPoint = () => {
   if (window.innerWidth < 576) {
     gridElem = 20;
   } else if (window.innerWidth < 768) {
@@ -216,4 +220,5 @@ const resizeGame = () => {
   canvas.height = Math.floor((window.innerHeight - 2) / gridElem) * gridElem;
   start();
 };
-resizeGame();
+
+entryPoint();
