@@ -10,6 +10,7 @@ let snake;
 let score;
 let speed;
 let running = false;
+let isInputLocked = false;    // lock keydown input if previous didn't include in the snake chain
 
 const drawMap = () => {
   ctx.fillStyle = "#333";
@@ -50,24 +51,30 @@ window.addEventListener("click", () => {
 });
 
 window.addEventListener("keydown", (event) => {
-  switch (event.key) {
-    case "ArrowRight":
-      if (direction !== "o") direction = "e";
-      break;
-    case "ArrowLeft":
-      if (direction !== "e") direction = "o";
-      break;
-    case "ArrowUp":
-      if (direction !== "s") direction = "n";
-      break;
-    case "ArrowDown":
-      if (direction !== "n") direction = "s";
-      break;
-    case " ":
-      alert("PAUSE");
-      break;
-    default:
-      break;
+  if (!isInputLocked) {
+    switch (event.key) {
+      case "ArrowRight":
+        if (direction !== "o") direction = "e";
+        isInputLocked = true;
+        break;
+      case "ArrowLeft":
+        if (direction !== "e") direction = "o";
+        isInputLocked = true;
+        break;
+      case "ArrowUp":
+        if (direction !== "s") direction = "n";
+        isInputLocked = true;
+        break;
+      case "ArrowDown":
+        if (direction !== "n") direction = "s";
+        isInputLocked = true;
+        break;
+      case " ":
+        alert("PAUSE");
+        break;
+      default:
+        break;
+    }
   }
 });
 
@@ -151,6 +158,7 @@ const testColision = () => {
   //   head[1] = canvas.height / gridElem;
   // }
 
+  isInputLocked = false;
   if (head[0] === apple[0] && head[1] === apple[1]) {
     score++;
     if (speed <= 960) speed += 5;
