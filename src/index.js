@@ -10,6 +10,7 @@ let snake;
 let score;
 let speed;
 let running = false;
+let isInputLocked = false;    // lock keydown input if previous didn't include in the snake chain
 
 const drawMap = () => {
   ctx.fillStyle = "#333";
@@ -39,36 +40,45 @@ const drawApple = () => {
 };
 
 window.addEventListener("resize", () => {
-  resizeGame();
+  entryPoint();
 });
 
 window.addEventListener("click", () => {
   if (!running) {
     running = true;
-    requestAnimationFrame(move);
+    requestAnimationFrame(mainLoop);
   }
 });
 
 window.addEventListener("keydown", (event) => {
-  switch (event.key) {
-    case "ArrowRight":
-      if (direction !== "o") direction = "e";
-      break;
-    case "ArrowLeft":
-      if (direction !== "e") direction = "o";
-      break;
-    case "ArrowUp":
-      if (direction !== "s") direction = "n";
-      break;
-    case "ArrowDown":
-      if (direction !== "n") direction = "s";
-      break;
-    default:
-      break;
+  if (!isInputLocked) {
+    switch (event.key) {
+      case "ArrowRight":
+        if (direction !== "o") direction = "e";
+        isInputLocked = true;
+        break;
+      case "ArrowLeft":
+        if (direction !== "e") direction = "o";
+        isInputLocked = true;
+        break;
+      case "ArrowUp":
+        if (direction !== "s") direction = "n";
+        isInputLocked = true;
+        break;
+      case "ArrowDown":
+        if (direction !== "n") direction = "s";
+        isInputLocked = true;
+        break;
+      case " ":
+        alert("PAUSE");
+        break;
+      default:
+        break;
+    }
   }
 });
 
-const gameover = () => {
+const isGameOver = () => {
   // Enlever partie du if pour versionner jeu en passage des murs
   if (
     snake[0][0] >= canvas.width / gridElem ||
@@ -114,7 +124,8 @@ const generateSnake = () => {
   direction = ["e", "n", "s"][Math.trunc(Math.random() * 3)];
 };
 
-const updateSnakePosition = () => {
+
+const testColision = () => {
   let head;
   switch (direction) {
     case "e":
@@ -147,6 +158,7 @@ const updateSnakePosition = () => {
   //   head[1] = canvas.height / gridElem;
   // }
 
+  isInputLocked = false;
   if (head[0] === apple[0] && head[1] === apple[1]) {
     score++;
     if (speed <= 960) speed += 5;
@@ -154,7 +166,7 @@ const updateSnakePosition = () => {
   } else {
     snake.pop();
   }
-  return gameover();
+  return isGameOver();
 };
 
 const drawScore = () => {
@@ -164,14 +176,14 @@ const drawScore = () => {
   ctx.fillText(score, gridElem, gridElem);
 };
 
-const move = () => {
-  if (!updateSnakePosition()) {
+const mainLoop = () => {
+  if (!testColision()) {
     drawMap();
     drawSnake();
     drawApple();
     drawScore();
     setTimeout(() => {
-      requestAnimationFrame(move);
+      requestAnimationFrame(mainLoop);
     }, 1000 - speed);
   } else {
     alert(`Perdu ! Votre score est : ${score}`);
@@ -198,7 +210,7 @@ const start = () => {
   generateSnake();
 };
 
-const resizeGame = () => {
+const entryPoint = () => {
   if (window.innerWidth < 576) {
     gridElem = 20;
   } else if (window.innerWidth < 768) {
@@ -216,4 +228,5 @@ const resizeGame = () => {
   canvas.height = Math.floor((window.innerHeight - 2) / gridElem) * gridElem;
   start();
 };
-resizeGame();
+
+entryPoint();
